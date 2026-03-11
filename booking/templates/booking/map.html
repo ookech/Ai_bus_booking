@@ -1,0 +1,382 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Bus Routes Map - AI Bus Booking{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+    #map {
+        height: 600px;
+        width: 100%;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+    
+    .map-container {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 30px 0;
+        margin-bottom: 30px;
+    }
+    
+    .map-header {
+        color: white;
+        margin-bottom: 20px;
+    }
+    
+    .map-header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+    }
+    
+    .map-header p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+    
+    .route-card {
+        background: white;
+        border-left: 4px solid #667eea;
+        padding: 20px;
+        margin-bottom: 15px;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .route-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        transform: translateX(5px);
+    }
+    
+    .route-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+    
+    .route-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .route-info {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+    }
+    
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #666;
+        font-size: 0.95rem;
+    }
+    
+    .info-item strong {
+        color: #333;
+    }
+    
+    .journey-list {
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid #eee;
+    }
+    
+    .journey-item {
+        background: #f8f9fa;
+        padding: 12px;
+        margin-bottom: 8px;
+        border-radius: 4px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .journey-time {
+        font-weight: 600;
+        color: #667eea;
+    }
+    
+    .journey-seats {
+        background: #667eea;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+    }
+    
+    .filter-section {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .filter-controls {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .filter-controls button {
+        background: #667eea;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background 0.3s ease;
+    }
+    
+    .filter-controls button:hover {
+        background: #764ba2;
+    }
+    
+    .legend {
+        background: white;
+        padding: 15px;
+        border-radius: 6px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        margin-top: 20px;
+    }
+    
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+    }
+    
+    .legend-color {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+    
+    .popover-content {
+        font-size: 0.9rem;
+        max-width: 250px;
+    }
+    
+    .popover-title {
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #333;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="map-container">
+    <div class="container">
+        <div class="map-header">
+            <h1>🗺️ Live Bus Routes Map</h1>
+            <p>View all available bus routes and live journey locations</p>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Map -->
+    <div id="map"></div>
+    
+    <!-- Legend -->
+    <div class="legend">
+        <h5 style="margin-top: 0;">Map Legend</h5>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #FF6B6B;"></div>
+            <span>Scheduled Journeys</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #4ECDC4;"></div>
+            <span>In Transit</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #FFE66D;"></div>
+            <span>Route Start Point</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color" style="background: #95E1D3;"></div>
+            <span>Route End Point</span>
+        </div>
+    </div>
+    
+    <!-- Active Routes Section -->
+    <div style="margin-top: 40px;">
+        <h2 style="margin-bottom: 20px;">📍 Active Routes & Schedules</h2>
+        <div id="routes-container"></div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// Initialize map
+const map = L.map('map').setView([20.5937, 78.9629], 5);
+
+// Add tile layer
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors',
+    maxZoom: 19
+}).addTo(map);
+
+const routeMarkers = {};
+const journeyMarkers = [];
+
+// Bus journey status colors
+const statusColors = {
+    'scheduled': '#FF6B6B',
+    'in_transit': '#4ECDC4',
+    'completed': '#95E1D3',
+    'cancelled': '#999'
+};
+
+// Load routes
+fetch('{% url "booking:api_routes" %}')
+    .then(response => response.json())
+    .then(routes => {
+        routes.forEach(route => {
+            // Origin marker
+            const originMarker = L.marker([route.origin_lat, route.origin_lng], {
+                title: `Start: ${route.origin}`
+            }).bindPopup(`
+                <div class="popover-content">
+                    <div class="popover-title">🟡 ${route.origin}</div>
+                    Route: ${route.origin} → ${route.destination}<br>
+                    Distance: ${route.distance_km} km<br>
+                    Base: ₹${route.base_fare}
+                </div>
+            `).addTo(map);
+            
+            // Destination marker
+            const destMarker = L.marker([route.destination_lat, route.destination_lng], {
+                title: `End: ${route.destination}`,
+                icon: L.icon({
+                    iconUrl: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNSIgaGVpZ2h0PSI0MSIgdmlld0JveD0iMCAwIDI1IDQxIj48cGF0aCBmaWxsPSIjOTVFMUQzIiBkPSJNMTIuNSAwQzUuNTk2IDAgMCA1LjU5NiAwIDEyLjVjMCA5LjM3NSAxMi41IDI4LjEyNSAxMi41IDI4LjEyNXMyIDEuODc1IDEyLjUgLTI4LjEyNWMwIC02LjkwNC01LjU5Ni0xMi41LTEyLjUtMTIuNXptMCA3LjUxNmM0LjI4MSAwIDcuNzE5IDMuNDM4IDcuNzE5IDcuNzE5cy0zLjQzOCA3LjcxOS03LjcxOSA3LjcxOS03LjcxOS0zLjQzOC03LjcxOS03LjcxOSAzLjQzOC03LjcxOSA3LjcxOS03LjcxOXoiLz48L3N2Zz4=',
+                    iconSize: [25, 41]
+                })
+            }).bindPopup(`
+                <div class="popover-content">
+                    <div class="popover-title">🟢 ${route.destination}</div>
+                    Route: ${route.origin} → ${route.destination}<br>
+                    Distance: ${route.distance_km} km<br>
+                    Base: ₹${route.base_fare}
+                </div>
+            `).addTo(map);
+            
+            // Draw route line
+            L.polyline([
+                [route.origin_lat, route.origin_lng],
+                [route.destination_lat, route.destination_lng]
+            ], {
+                color: '#667eea',
+                weight: 3,
+                opacity: 0.6,
+                dashArray: '5, 5'
+            }).bindPopup(`
+                <strong>${route.origin} → ${route.destination}</strong><br>
+                ${route.distance_km} km | Base: ₹${route.base_fare}
+            `).addTo(map);
+        });
+    });
+
+// Load live journeys
+function loadJourneys() {
+    fetch('{% url "booking:api_journeys_map" %}')
+        .then(response => response.json())
+        .then(journeys => {
+            // Clear existing journey markers
+            journeyMarkers.forEach(marker => map.removeLayer(marker));
+            journeyMarkers.length = 0;
+            
+            journeys.forEach(journey => {
+                const color = statusColors[journey.status] || '#999';
+                const marker = L.circleMarker([journey.current_lat, journey.current_lng], {
+                    radius: 8,
+                    fillColor: color,
+                    color: '#fff',
+                    weight: 2,
+                    opacity: 1,
+                    fillOpacity: 0.8,
+                    title: journey.bus_number
+                }).bindPopup(`
+                    <div class="popover-content">
+                        <div class="popover-title">🚌 ${journey.bus_number}</div>
+                        <strong>${journey.route__origin} → ${journey.route__destination}</strong><br>
+                        Type: ${journey.bus_type.toUpperCase()}<br>
+                        Depart: ${new Date(journey.departure_time).toLocaleString()}<br>
+                        Arrive: ${new Date(journey.arrival_time).toLocaleString()}<br>
+                        Available: ${journey.remaining_seats} seats<br>
+                        Price: ₹${journey.price_per_seat}/seat
+                    </div>
+                `).addTo(map);
+                
+                journeyMarkers.push(marker);
+            });
+            
+            // Update routes display
+            displayRoutes(journeys);
+        });
+}
+
+// Display active routes
+function displayRoutes(journeys) {
+    const container = document.getElementById('routes-container');
+    
+    // Group journeys by route
+    const routeGroups = {};
+    journeys.forEach(journey => {
+        const routeKey = `${journey.route__origin}_${journey.route__destination}`;
+        if (!routeGroups[routeKey]) {
+            routeGroups[routeKey] = {
+                route: journey,
+                journeys: []
+            };
+        }
+        routeGroups[routeKey].journeys.push(journey);
+    });
+    
+    let html = '';
+    Object.values(routeGroups).forEach(group => {
+        html += `
+            <div class="route-card">
+                <div class="route-card-header">
+                    <div class="route-title">
+                        📍 ${group.route.route__origin} → ${group.route.route__destination}
+                    </div>
+                </div>
+                <div class="journey-list">
+                    <strong style="display: block; margin-bottom: 10px;">Available Buses:</strong>
+                    ${group.journeys.map(j => `
+                        <div class="journey-item">
+                            <div>
+                                <strong>${j.bus_number}</strong> (${j.bus_type})<br>
+                                <span class="journey-time">${new Date(j.departure_time).toLocaleTimeString('en-IN', {hour: '2-digit', minute:'2-digit'})} - ${new Date(j.arrival_time).toLocaleTimeString('en-IN', {hour: '2-digit', minute:'2-digit'})}</span>
+                            </div>
+                            <span class="journey-seats">${j.remaining_seats} seats</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html || '<p style="color: #999;">No active journeys available</p>';
+}
+
+// Initial load
+loadJourneys();
+
+// Refresh journeys every 30 seconds
+setInterval(loadJourneys, 30000);
+</script>
+{% endblock %}

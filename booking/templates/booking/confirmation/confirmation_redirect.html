@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>Confirmation</title>
+    <link rel="stylesheet" href="{% static 'booking/style.css' %}">
+</head>
+<body>
+    <header>
+        <h1>Confirmation</h1>
+    </header>
+    <main>
+        <p>{{ message }}</p>
+        <a href="{% url 'booking:home' %}">Go to Home</a>
+    </main>
+    <footer>
+        <p>&copy; 2026 AI Bus Booking Guide</p>
+    </footer>
+</body>
+</html>

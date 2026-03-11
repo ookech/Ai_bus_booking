@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <title>Booking Confirmed</title>
+    <link rel="stylesheet" href="{% static 'booking/style.css' %}">
+</head>
+<body>
+    <header>
+        <h1>Booking Confirmed</h1>
+    </header>
+    <main>
+        <p>Thank you, {{ booking.passenger_name }}. Your booking for <strong>{{ booking.route }}</strong> with {{ booking.seats }} seat(s) is confirmed.</p>
+        <p>Booked at {{ booking.created_at }}</p>
+        <a href="{% url 'booking:home' %}">Back to home</a>
+    </main>
+    <footer>
+        <p>&copy; 2026 AI Bus Booking Guide</p>
+    </footer>
+</body>
+</html>

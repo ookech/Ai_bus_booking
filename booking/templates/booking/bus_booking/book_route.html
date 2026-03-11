@@ -1,0 +1,335 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Book Your Ticket - AI Bus Booking{% endblock %}
+
+{% block extra_css %}
+<style>
+    .booking-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px 0;
+        margin-bottom: 30px;
+    }
+    
+    .booking-container {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 30px;
+    }
+    
+    .booking-form {
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .form-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 20px;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+    }
+    
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 0.95rem;
+        box-sizing: border-box;
+        transition: border-color 0.3s ease;
+    }
+    
+    .form-group input:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .form-group textarea {
+        resize: vertical;
+        min-height: 80px;
+        display: none;
+    }
+    
+    .form-error {
+        color: #FF6B6B;
+        font-size: 0.9rem;
+        margin-top: 5px;
+    }
+    
+    .form-help {
+        color: #999;
+        font-size: 0.85rem;
+        margin-top: 5px;
+    }
+    
+    .submit-btn {
+        width: 100%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 15px;
+        border-radius: 6px;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 10px;
+    }
+    
+    .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    
+    .booking-summary {
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        height: fit-content;
+        position: sticky;
+        top: 20px;
+    }
+    
+    .summary-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 20px;
+    }
+    
+    .summary-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .summary-item:last-child {
+        border-bottom: none;
+    }
+    
+    .summary-label {
+        color: #666;
+        font-weight: 500;
+    }
+    
+    .summary-value {
+        font-weight: 700;
+        color: #333;
+    }
+    
+    .summary-divider {
+        border-top: 2px solid #667eea;
+        margin: 15px 0;
+    }
+    
+    .total-price {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .total-label {
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .total-value {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #667eea;
+    }
+    
+    .journey-info {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+    }
+    
+    .error-alert {
+        background: #ffe5e5;
+        border: 1px solid #FF6B6B;
+        color: #cc0000;
+        padding: 15px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+    }
+    
+    @media (max-width: 768px) {
+        .booking-container {
+            grid-template-columns: 1fr;
+        }
+        
+        .booking-summary {
+            position: static;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="booking-header">
+    <div class="container">
+        <h1>🎟️ Complete Your Booking</h1>
+        <p>{{ journey.route.origin }} → {{ journey.route.destination }}</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="booking-container">
+        <!-- Booking Form -->
+        <div class="booking-form">
+            {% if error %}
+            <div class="error-alert">
+                ⚠️ {{ error }}
+            </div>
+            {% endif %}
+            
+            <h2 class="form-title">Passenger Details</h2>
+            
+            <div class="journey-info">
+                <strong style="display: block; margin-bottom: 10px;">Journey Information:</strong>
+                Bus: {{ journey.bus.bus_number }} ({{ journey.bus.get_bus_type_display }})<br>
+                Date: {{ journey.departure_time|date:"d M, Y" }}<br>
+                Time: {{ journey.departure_time|time:"H:i" }} - {{ journey.arrival_time|time:"H:i" }}<br>
+                Price: ₹{{ journey.price_per_seat }}/seat
+            </div>
+            
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="{{ form.passenger_name.id_for_label }}">Full Name *</label>
+                    {{ form.passenger_name }}
+                    {% if form.passenger_name.errors %}
+                        <div class="form-error">{{ form.passenger_name.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.passenger_email.id_for_label }}">Email Address</label>
+                    {{ form.passenger_email }}
+                    {% if form.passenger_email.errors %}
+                        <div class="form-error">{{ form.passenger_email.errors.0 }}</div>
+                    {% endif %}
+                    <div class="form-help">We'll send your booking confirmation here</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.passenger_phone.id_for_label }}">Phone Number</label>
+                    {{ form.passenger_phone }}
+                    {% if form.passenger_phone.errors %}
+                        <div class="form-error">{{ form.passenger_phone.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.seats.id_for_label }}">Number of Seats *</label>
+                    {{ form.seats }}
+                    {% if form.seats.errors %}
+                        <div class="form-error">{{ form.seats.errors.0 }}</div>
+                    {% endif %}
+                    <div class="form-help">Maximum {{ remaining_seats }} seats available</div>
+                </div>
+                
+                <button type="submit" class="submit-btn">✅ Proceed to Payment</button>
+                <a href="{% url 'booking:journey_detail' journey.id %}" style="display: block; text-align: center; color: #999; text-decoration: none; margin-top: 15px;">Back to Journey Details</a>
+            </form>
+        </div>
+        
+        <!-- Booking Summary -->
+        <div class="booking-summary">
+            <h3 class="summary-title">📋 Booking Summary</h3>
+            
+            <div class="summary-item">
+                <span class="summary-label">Bus Number</span>
+                <span class="summary-value">{{ journey.bus.bus_number }}</span>
+            </div>
+            
+            <div class="summary-item">
+                <span class="summary-label">Bus Type</span>
+                <span class="summary-value">{{ journey.bus.get_bus_type_display }}</span>
+            </div>
+            
+            <div class="summary-item">
+                <span class="summary-label">Route</span>
+                <span class="summary-value">{{ journey.route.origin }} → {{ journey.route.destination }}</span>
+            </div>
+            
+            <div class="summary-item">
+                <span class="summary-label">Distance</span>
+                <span class="summary-value">{{ journey.route.distance_km }} km</span>
+            </div>
+            
+            <div class="summary-item">
+                <span class="summary-label">Departure</span>
+                <span class="summary-value">{{ journey.departure_time|time:"H:i" }}</span>
+            </div>
+            
+            <div class="summary-item">
+                <span class="summary-label">Arrival</span>
+                <span class="summary-value">{{ journey.arrival_time|time:"H:i" }}</span>
+            </div>
+            
+            <div class="summary-divider"></div>
+            
+            <div class="summary-item">
+                <span class="summary-label">Price per Seat</span>
+                <span class="summary-value">₹{{ journey.price_per_seat }}</span>
+            </div>
+            
+            <div class="summary-item">
+                <span class="summary-label">Available Seats</span>
+                <span class="summary-value">{{ remaining_seats }}</span>
+            </div>
+            
+            <div class="summary-divider"></div>
+            
+            <div class="summary-item">
+                <span class="summary-label">Booking Status</span>
+                <span class="summary-value" style="color: #30b570;">Active ✓</span>
+            </div>
+            
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-top: 20px; font-size: 0.9rem; color: #666;">
+                <p style="margin: 0;"><strong>Important:</strong></p>
+                <ul style="margin: 10px 0 0 0; padding-left: 20px;">
+                    <li>Booking is valid for 24 hours</li>
+                    <li>Cancellation available till 6 hours before departure</li>
+                    <li>Refund will be credited within 3-5 business days</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Update total price when seats change
+    const seatsInput = document.querySelector('input[name="seats"]');
+    const pricePerSeat = parseFloat('{{ journey.price_per_seat }}');
+    
+    if (seatsInput) {
+        seatsInput.addEventListener('change', function() {
+            console.log('Seats changed to:', this.value);
+        });
+    }
+</script>
+{% endblock %}

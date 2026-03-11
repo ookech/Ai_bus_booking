@@ -1,0 +1,391 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Journey Details - AI Bus Booking{% endblock %}
+
+{% block extra_css %}
+<style>
+    .journey-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 30px 0;
+        margin-bottom: 30px;
+    }
+    
+    .journey-container {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 30px;
+    }
+    
+    .journey-details {
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .journey-main {
+        display: flex;
+        align-items: center;
+        gap: 30px;
+        margin-bottom: 30px;
+        padding-bottom: 30px;
+        border-bottom: 2px solid #f0f0f0;
+    }
+    
+    .route-visual {
+        flex: 1;
+        text-align: center;
+    }
+    
+    .city {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 10px;
+    }
+    
+    .route-line {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        margin: 20px 0;
+    }
+    
+    .route-line::before,
+    .route-line::after {
+        content: '●';
+        font-size: 1rem;
+        color: #667eea;
+    }
+    
+    .route-line span {
+        flex: 1;
+        height: 3px;
+        background: linear-gradient(90deg, #667eea, #764ba2);
+        margin: 0 10px;
+    }
+    
+    .duration-badge {
+        background: #f0f0f0;
+        padding: 10px 15px;
+        border-radius: 20px;
+        font-weight: 600;
+        color: #667eea;
+    }
+    
+    .bus-info {
+        flex: 1;
+    }
+    
+    .bus-name {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 10px;
+    }
+    
+    .bus-details {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+    
+    .detail-item {
+        background: #f8f9fa;
+        padding: 12px;
+        border-radius: 6px;
+    }
+    
+    .detail-label {
+        font-size: 0.85rem;
+        color: #999;
+        text-transform: uppercase;
+        margin-bottom: 4px;
+    }
+    
+    .detail-value {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .time-schedule {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-top: 30px;
+    }
+    
+    .time-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+    
+    .time-row:last-child {
+        margin-bottom: 0;
+    }
+    
+    .time-label {
+        color: #999;
+        font-size: 0.9rem;
+    }
+    
+    .time-value {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #333;
+    }
+    
+    .amenities {
+        margin-top: 30px;
+    }
+    
+    .amenities h3 {
+        margin-bottom: 15px;
+        color: #333;
+    }
+    
+    .amenities-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 15px;
+    }
+    
+    .amenity {
+        background: #f8f9fa;
+        padding: 12px;
+        border-radius: 6px;
+        text-align: center;
+        color: #667eea;
+        font-weight: 600;
+    }
+    
+    .booking-sidebar {
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        height: fit-content;
+        position: sticky;
+        top: 20px;
+    }
+    
+    .booking-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 20px;
+    }
+    
+    .price-display {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 6px;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    
+    .price-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+    
+    .price-value {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 10px 0;
+    }
+    
+    .price-per-seat {
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+    
+    .seats-status {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    
+    .seats-available-text {
+        font-weight: 700;
+        color: #30b570;
+        font-size: 1.2rem;
+    }
+    
+    .book-button {
+        width: 100%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        padding: 15px;
+        border-radius: 6px;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+    }
+    
+    .book-button:hover {
+        transform: translateY(-2px);
+    }
+    
+    .book-button:disabled {
+        background: #ddd;
+        cursor: not-allowed;
+    }
+    
+    @media (max-width: 768px) {
+        .journey-container {
+            grid-template-columns: 1fr;
+        }
+        
+        .booking-sidebar {
+            position: static;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="journey-header">
+    <div class="container">
+        <h1>🚌 Journey Details</h1>
+    </div>
+</div>
+
+<div class="container">
+    <div class="journey-container">
+        <!-- Journey Details -->
+        <div class="journey-details">
+            <!-- Main Route Info -->
+            <div class="journey-main">
+                <div class="route-visual">
+                    <div class="city">{{ journey.route.origin }}</div>
+                    <div class="route-line">
+                        <span></span>
+                    </div>
+                    <div class="city">{{ journey.route.destination }}</div>
+                    <div class="duration-badge">
+                        ⏱️ {{ journey.route.duration|add:"0" }}
+                    </div>
+                </div>
+                
+                <div class="bus-info">
+                    <div class="bus-name">{{ journey.bus.name }}</div>
+                    <div class="bus-name" style="font-size: 1rem; color: #999;">{{ journey.bus.bus_number }}</div>
+                    
+                    <div class="bus-details">
+                        <div class="detail-item">
+                            <div class="detail-label">Type</div>
+                            <div class="detail-value">{{ journey.bus.get_bus_type_display }}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Capacity</div>
+                            <div class="detail-value">{{ journey.bus.capacity }} seats</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Status</div>
+                            <div class="detail-value" style="color: {% if journey.status == 'scheduled' %}#30b570{% elif journey.status == 'in_transit' %}#ff9800{% else %}#999{% endif %};">
+                                {{ journey.get_status_display }}
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Distance</div>
+                            <div class="detail-value">{{ journey.route.distance_km }} km</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Time Schedule -->
+            <div class="time-schedule">
+                <h3 style="margin-bottom: 20px;">⏰ Schedule</h3>
+                <div class="time-row">
+                    <div>
+                        <div class="time-label">Departure</div>
+                        <div class="time-value">{{ journey.departure_time|date:"H:i" }}</div>
+                    </div>
+                    <div>
+                        <div class="time-label">Date</div>
+                        <div class="time-value">{{ journey.departure_time|date:"d M, Y" }}</div>
+                    </div>
+                </div>
+                
+                <div style="border-top: 1px solid #ddd; margin: 15px 0;"></div>
+                
+                <div class="time-row">
+                    <div>
+                        <div class="time-label">Arrival</div>
+                        <div class="time-value">{{ journey.arrival_time|time:"H:i" }}</div>
+                    </div>
+                    <div>
+                        <div class="time-label">Date</div>
+                        <div class="time-value">{{ journey.arrival_time|date:"d M, Y" }}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Amenities -->
+            <div class="amenities">
+                <h3>✨ Amenities</h3>
+                <div class="amenities-grid">
+                    <div class="amenity">🛴 AC</div>
+                    <div class="amenity">📱 USB</div>
+                    <div class="amenity">🍽️ Meal</div>
+                    <div class="amenity">🛛 Pillow</div>
+                    <div class="amenity">📡 WiFi</div>
+                    <div class="amenity">🚻 Toilet</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Booking Sidebar -->
+        <div class="booking-sidebar">
+            <div class="booking-title">💳 Booking</div>
+            
+            <div class="price-display">
+                <div class="price-label">Price Per Seat</div>
+                <div class="price-value">₹{{ journey.price_per_seat }}</div>
+                <div class="price-per-seat">Book now to save</div>
+            </div>
+            
+            <div class="seats-status">
+                <div class="seats-available-text">{{ remaining_seats }} Seats Available</div>
+                <p style="color: #999; margin-top: 5px;">{{ booked_seats }} already booked</p>
+            </div>
+            
+            {% if remaining_seats > 0 %}
+            <a href="{% url 'booking:book_journey' journey.id %}" class="book-button">
+                📌 Book Now
+            </a>
+            <p style="text-align: center; color: #999; margin-top: 15px; font-size: 0.9rem;">
+                Secure your seat. Limited availability.
+            </p>
+            {% else %}
+            <button class="book-button" disabled>
+                😞 Sold Out
+            </button>
+            <p style="text-align: center; color: #999; margin-top: 15px; font-size: 0.9rem;">
+                This journey is fully booked
+            </p>
+            {% endif %}
+            
+            <!-- Booking Info -->
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-top: 20px; font-size: 0.9rem; color: #666;">
+                <p style="margin: 0;">✓ Easy cancellation</p>
+                <p style="margin: 5px 0 0 0;">✓ Secure payment</p>
+                <p style="margin: 5px 0 0 0;">✓ Instant confirmation</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

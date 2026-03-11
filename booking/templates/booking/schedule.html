@@ -1,0 +1,417 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Bus Schedule - AI Bus Booking{% endblock %}
+
+{% block extra_css %}
+<style>
+    .schedule-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 40px 0;
+        margin-bottom: 30px;
+    }
+    
+    .schedule-header h1 {
+        font-size: 2rem;
+        margin-bottom: 10px;
+    }
+    
+    .search-box {
+        background: white;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+    
+    .search-form {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+    }
+    
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .form-group label {
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #333;
+        font-size: 0.95rem;
+    }
+    
+    .form-group input,
+    .form-group select {
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 0.95rem;
+        transition: border-color 0.3s ease;
+    }
+    
+    .form-group input:focus,
+    .form-group select:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .search-btn {
+        background: #667eea;
+        color: white;
+        border: none;
+        padding: 12px 30px;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.3s ease;
+        align-self: flex-end;
+    }
+    
+    .search-btn:hover {
+        background: #764ba2;
+    }
+    
+    .schedule-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        margin-bottom: 30px;
+    }
+    
+    .schedule-table thead {
+        background: #f8f9fa;
+        border-bottom: 2px solid #ddd;
+    }
+    
+    .schedule-table th {
+        padding: 16px;
+        text-align: left;
+        font-weight: 600;
+        color: #333;
+        font-size: 0.95rem;
+    }
+    
+    .schedule-table td {
+        padding: 16px;
+        border-bottom: 1px solid #eee;
+        font-size: 0.95rem;
+    }
+    
+    .schedule-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+    
+    .route-info {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .route-name {
+        font-weight: 600;
+        color: #667eea;
+        margin-bottom: 4px;
+    }
+    
+    .route-distance {
+        color: #999;
+        font-size: 0.85rem;
+    }
+    
+    .time-info {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .departure-time,
+    .arrival-time {
+        font-weight: 600;
+        color: #333;
+    }
+    
+    .time-separator {
+        color: #999;
+        font-size: 0.85rem;
+        margin: 2px 0;
+    }
+    
+    .seats-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .seats-available {
+        background: #30b570;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    .seats-limited {
+        background: #ff9800;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    .seats-unavailable {
+        background: #ddd;
+        color: #666;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+    
+    .price-info {
+        font-weight: 600;
+        color: #667eea;
+        font-size: 1.1rem;
+    }
+    
+    .book-btn {
+        background: #667eea;
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .book-btn:hover {
+        background: #764ba2;
+    }
+    
+    .book-btn:disabled {
+        background: #ddd;
+        cursor: not-allowed;
+    }
+    
+    .no-results {
+        background: white;
+        padding: 40px;
+        text-align: center;
+        border-radius: 8px;
+        color: #999;
+    }
+    
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 30px;
+    }
+    
+    .pagination a,
+    .pagination span {
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        text-decoration: none;
+        color: #667eea;
+    }
+    
+    .pagination a:hover {
+        background: #667eea;
+        color: white;
+    }
+    
+    .pagination .current {
+        background: #667eea;
+        color: white;
+        border-color: #667eea;
+    }
+    
+    .schedule-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    
+    .stat-card {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+    
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #667eea;
+    }
+    
+    .stat-label {
+        color: #999;
+        font-size: 0.9rem;
+        margin-top: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="schedule-header">
+    <div class="container">
+        <h1>🚌 Bus Schedule</h1>
+        <p>Find and book your perfect bus journey</p>
+    </div>
+</div>
+
+<div class="container">
+    <!-- Search Form -->
+    <div class="search-box">
+        <form method="get" class="search-form">
+            <div class="form-group">
+                <label for="id_origin">From</label>
+                {{ form.origin }}
+            </div>
+            <div class="form-group">
+                <label for="id_destination">To</label>
+                {{ form.destination }}
+            </div>
+            <div class="form-group">
+                <label for="id_departure_date">Date</label>
+                {{ form.departure_date }}
+            </div>
+            <div class="form-group">
+                <label for="id_bus_type">Bus Type</label>
+                {{ form.bus_type }}
+            </div>
+            <button type="submit" class="search-btn">🔍 Search</button>
+        </form>
+    </div>
+    
+    <!-- Stats -->
+    {% if page_obj %}
+    <div class="schedule-stats">
+        <div class="stat-card">
+            <div class="stat-value">{{ page_obj.paginator.count }}</div>
+            <div class="stat-label">Total Journeys</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ journeys|length }}</div>
+            <div class="stat-label">On This Page</div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Schedule Table -->
+    {% if page_obj %}
+        {% if journeys %}
+        <table class="schedule-table">
+            <thead>
+                <tr>
+                    <th>🚌 Bus</th>
+                    <th>📍 Route</th>
+                    <th>⏰ Departure</th>
+                    <th>🎯 Arrival</th>
+                    <th>💺 Seats</th>
+                    <th>💰 Price</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for journey in journeys %}
+                <tr>
+                    <td>
+                        <strong>{{ journey.bus.bus_number }}</strong><br>
+                        <span style="color: #999; font-size: 0.9rem;">{{ journey.bus.get_bus_type_display }}</span>
+                    </td>
+                    <td>
+                        <div class="route-info">
+                            <div class="route-name">{{ journey.route.origin }} → {{ journey.route.destination }}</div>
+                            <div class="route-distance">{{ journey.route.distance_km }} km</div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="time-info">
+                            <span class="departure-time">{{ journey.departure_time|time:"H:i" }}</span>
+                            <span class="time-separator">{{ journey.departure_time|date:"d M" }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="time-info">
+                            <span class="arrival-time">{{ journey.arrival_time|time:"H:i" }}</span>
+                            <span class="time-separator">{{ journey.arrival_time|date:"d M" }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="seats-info">
+                            {% if journey.remaining_seats > 5 %}
+                                <span class="seats-available">{{ journey.remaining_seats }} available</span>
+                            {% elif journey.remaining_seats > 0 %}
+                                <span class="seats-limited">{{ journey.remaining_seats }} left</span>
+                            {% else %}
+                                <span class="seats-unavailable">Full</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="price-info">₹{{ journey.price_per_seat }}</div>
+                    </td>
+                    <td>
+                        {% if journey.remaining_seats > 0 %}
+                            <a href="{% url 'booking:book_journey' journey.id %}" class="book-btn">Book</a>
+                        {% else %}
+                            <button class="book-btn" disabled>Sold Out</button>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">« First</a>
+                <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">‹ Previous</a>
+            {% endif %}
+            
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <span class="current">{{ num }}</span>
+                {% else %}
+                    <a href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+            
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Next ›</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">Last »</a>
+            {% endif %}
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="no-results">
+            <h3>😞 No journeys found</h3>
+            <p>Try adjusting your search criteria</p>
+        </div>
+        {% endif %}
+    {% else %}
+    <div class="no-results">
+        <h3>🔍 Search for available buses</h3>
+        <p>Enter your departure and destination cities to see available buses</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
