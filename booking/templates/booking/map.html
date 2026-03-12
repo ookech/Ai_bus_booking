@@ -220,14 +220,24 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-// Initialize map
-const map = L.map('map').setView([20.5937, 78.9629], 5);
+// Initialize map - Centered on Kenya, Africa
+const map = L.map('map').setView([-0.0236, 37.9062], 6);
 
 // Add tile layer
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '© OpenStreetMap contributors',
-    maxZoom: 19
+    maxZoom: 19,
+    minZoom: 4
 }).addTo(map);
+
+// Add a boundary for Kenya to show regional context
+const kenyaBoundary = [
+    [-4.6796, 33.8735],
+    [-4.6796, 41.8541],
+    [3.0573, 41.8541],
+    [3.0573, 33.8735],
+    [-4.6796, 33.8735]
+];
 
 const routeMarkers = {};
 const journeyMarkers = [];
@@ -253,7 +263,7 @@ fetch('{% url "booking:api_routes" %}')
                     <div class="popover-title">🟡 ${route.origin}</div>
                     Route: ${route.origin} → ${route.destination}<br>
                     Distance: ${route.distance_km} km<br>
-                    Base: ₹${route.base_fare}
+                    Base: KES ${route.base_fare}
                 </div>
             `).addTo(map);
             
@@ -269,7 +279,7 @@ fetch('{% url "booking:api_routes" %}')
                     <div class="popover-title">🟢 ${route.destination}</div>
                     Route: ${route.origin} → ${route.destination}<br>
                     Distance: ${route.distance_km} km<br>
-                    Base: ₹${route.base_fare}
+                    Base: KES ${route.base_fare}
                 </div>
             `).addTo(map);
             
@@ -284,7 +294,7 @@ fetch('{% url "booking:api_routes" %}')
                 dashArray: '5, 5'
             }).bindPopup(`
                 <strong>${route.origin} → ${route.destination}</strong><br>
-                ${route.distance_km} km | Base: ₹${route.base_fare}
+                ${route.distance_km} km | Base: KES ${route.base_fare}
             `).addTo(map);
         });
     });
@@ -316,7 +326,7 @@ function loadJourneys() {
                         Depart: ${new Date(journey.departure_time).toLocaleString()}<br>
                         Arrive: ${new Date(journey.arrival_time).toLocaleString()}<br>
                         Available: ${journey.remaining_seats} seats<br>
-                        Price: ₹${journey.price_per_seat}/seat
+                        Price: KES ${journey.price_per_seat}/seat
                     </div>
                 `).addTo(map);
                 

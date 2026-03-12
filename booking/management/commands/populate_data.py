@@ -35,19 +35,19 @@ class Command(BaseCommand):
         buses_data = [
             {
                 'bus_number': 'BUS-001',
-                'name': 'Mumbai Express',
+                'name': 'Nairobi Express',
                 'capacity': 50,
                 'bus_type': 'express',
-                'license_plate': 'MH-01-AB-0001',
+                'license_plate': 'KE-01-AA-0001',
                 'manufacturer': 'Volvo',
                 'year': 2023
             },
             {
                 'bus_number': 'BUS-002',
-                'name': 'Luxury Traveler',
+                'name': 'Luxury Safari',
                 'capacity': 40,
                 'bus_type': 'luxury',
-                'license_plate': 'MH-01-AB-0002',
+                'license_plate': 'KE-01-AA-0002',
                 'manufacturer': 'Scania',
                 'year': 2023
             },
@@ -56,25 +56,25 @@ class Command(BaseCommand):
                 'name': 'Standard Coach',
                 'capacity': 60,
                 'bus_type': 'standard',
-                'license_plate': 'MH-01-AB-0003',
+                'license_plate': 'KE-01-AA-0003',
                 'manufacturer': 'Ashok Leyland',
                 'year': 2022
             },
             {
                 'bus_number': 'BUS-004',
-                'name': 'Pune Rapid',
+                'name': 'Coastal Runner',
                 'capacity': 55,
                 'bus_type': 'express',
-                'license_plate': 'MH-02-AB-0004',
+                'license_plate': 'KE-02-AA-0004',
                 'manufacturer': 'Volvo',
                 'year': 2023
             },
             {
                 'bus_number': 'BUS-005',
-                'name': 'Bangalore Express',
+                'name': 'Mombasa Express',
                 'capacity': 48,
                 'bus_type': 'express',
-                'license_plate': 'KA-01-AB-0005',
+                'license_plate': 'KE-03-AA-0005',
                 'manufacturer': 'Scania',
                 'year': 2023
             },
@@ -97,64 +97,64 @@ class Command(BaseCommand):
 
         routes_data = [
             {
-                'origin': 'Mumbai',
-                'destination': 'Pune',
-                'origin_lat': 19.0760,
-                'origin_lng': 72.8777,
-                'destination_lat': 18.5204,
-                'destination_lng': 73.8567,
-                'distance_km': 150,
-                'duration': timedelta(hours=3),
-                'base_fare': 500,
-                'buses': ['BUS-001', 'BUS-003']
-            },
-            {
-                'origin': 'Mumbai',
-                'destination': 'Bangalore',
-                'origin_lat': 19.0760,
-                'origin_lng': 72.8777,
-                'destination_lat': 12.9716,
-                'destination_lng': 77.5946,
-                'distance_km': 850,
-                'duration': timedelta(hours=14),
-                'base_fare': 1200,
-                'buses': ['BUS-002', 'BUS-005']
-            },
-            {
-                'origin': 'Pune',
-                'destination': 'Bangalore',
-                'origin_lat': 18.5204,
-                'origin_lng': 73.8567,
-                'destination_lat': 12.9716,
-                'destination_lng': 77.5946,
-                'distance_km': 700,
-                'duration': timedelta(hours=11),
-                'base_fare': 900,
-                'buses': ['BUS-004', 'BUS-003']
-            },
-            {
-                'origin': 'Mumbai',
-                'destination': 'Ahmedabad',
-                'origin_lat': 19.0760,
-                'origin_lng': 72.8777,
-                'destination_lat': 23.0225,
-                'destination_lng': 72.5714,
-                'distance_km': 500,
-                'duration': timedelta(hours=8),
-                'base_fare': 700,
+                'origin': 'Nairobi',
+                'destination': 'Mombasa',
+                'origin_lat': -1.2921,
+                'origin_lng': 36.8219,
+                'destination_lat': -4.0435,
+                'destination_lng': 39.6682,
+                'distance_km': 485,
+                'duration': timedelta(hours=7),
+                'base_fare': 2500,
                 'buses': ['BUS-001', 'BUS-004']
             },
             {
-                'origin': 'Pune',
-                'destination': 'Hyderabad',
-                'origin_lat': 18.5204,
-                'origin_lng': 73.8567,
-                'destination_lat': 17.3850,
-                'destination_lng': 78.4867,
-                'distance_km': 580,
-                'duration': timedelta(hours=10),
+                'origin': 'Nairobi',
+                'destination': 'Nakuru',
+                'origin_lat': -1.2921,
+                'origin_lng': 36.8219,
+                'destination_lat': -0.3031,
+                'destination_lng': 35.8696,
+                'distance_km': 160,
+                'duration': timedelta(hours=2, minutes=30),
+                'base_fare': 1000,
+                'buses': ['BUS-001', 'BUS-003']
+            },
+            {
+                'origin': 'Nairobi',
+                'destination': 'Kisumu',
+                'origin_lat': -1.2921,
+                'origin_lng': 36.8219,
+                'destination_lat': -0.1022,
+                'destination_lng': 34.7617,
+                'distance_km': 355,
+                'duration': timedelta(hours=5),
+                'base_fare': 1800,
+                'buses': ['BUS-002', 'BUS-005']
+            },
+            {
+                'origin': 'Mombasa',
+                'destination': 'Nakuru',
+                'origin_lat': -4.0435,
+                'origin_lng': 39.6682,
+                'destination_lat': -0.3031,
+                'destination_lng': 35.8696,
+                'distance_km': 520,
+                'duration': timedelta(hours=8),
+                'base_fare': 2200,
+                'buses': ['BUS-004', 'BUS-005']
+            },
+            {
+                'origin': 'Nakuru',
+                'destination': 'Kericho',
+                'origin_lat': -0.3031,
+                'origin_lng': 35.8696,
+                'destination_lat': -0.3667,
+                'destination_lng': 35.2833,
+                'distance_km': 95,
+                'duration': timedelta(hours=2),
                 'base_fare': 800,
-                'buses': ['BUS-002', 'BUS-004']
+                'buses': ['BUS-001', 'BUS-002']
             },
         ]
 
@@ -185,26 +185,26 @@ class Command(BaseCommand):
         base_date = now + timedelta(days=1)
 
         journeys_data = [
-            # Mumbai to Pune
-            {'route': 'Mumbai-Pune', 'bus': 'BUS-001', 'date_offset': 0, 'departure_hour': 8, 'seats': 50, 'price': 600},
-            {'route': 'Mumbai-Pune', 'bus': 'BUS-001', 'date_offset': 0, 'departure_hour': 14, 'seats': 35, 'price': 650},
-            {'route': 'Mumbai-Pune', 'bus': 'BUS-003', 'date_offset': 0, 'departure_hour': 18, 'seats': 60, 'price': 550},
+            # Nairobi to Mombasa
+            {'route': 'Nairobi-Mombasa', 'bus': 'BUS-001', 'date_offset': 0, 'departure_hour': 8, 'seats': 50, 'price': 3000},
+            {'route': 'Nairobi-Mombasa', 'bus': 'BUS-004', 'date_offset': 0, 'departure_hour': 14, 'seats': 35, 'price': 3200},
+            {'route': 'Nairobi-Mombasa', 'bus': 'BUS-005', 'date_offset': 1, 'departure_hour': 20, 'seats': 40, 'price': 2800},
             
-            # Mumbai to Bangalore
-            {'route': 'Mumbai-Bangalore', 'bus': 'BUS-002', 'date_offset': 0, 'departure_hour': 20, 'seats': 40, 'price': 1500},
-            {'route': 'Mumbai-Bangalore', 'bus': 'BUS-005', 'date_offset': 1, 'departure_hour': 8, 'seats': 48, 'price': 1400},
+            # Nairobi to Nakuru
+            {'route': 'Nairobi-Nakuru', 'bus': 'BUS-001', 'date_offset': 0, 'departure_hour': 9, 'seats': 45, 'price': 1200},
+            {'route': 'Nairobi-Nakuru', 'bus': 'BUS-003', 'date_offset': 0, 'departure_hour': 16, 'seats': 55, 'price': 1100},
             
-            # Pune to Bangalore
-            {'route': 'Pune-Bangalore', 'bus': 'BUS-004', 'date_offset': 0, 'departure_hour': 10, 'seats': 55, 'price': 1100},
-            {'route': 'Pune-Bangalore', 'bus': 'BUS-003', 'date_offset': 1, 'departure_hour': 16, 'seats': 50, 'price': 1050},
+            # Nairobi to Kisumu
+            {'route': 'Nairobi-Kisumu', 'bus': 'BUS-002', 'date_offset': 0, 'departure_hour': 7, 'seats': 40, 'price': 2200},
+            {'route': 'Nairobi-Kisumu', 'bus': 'BUS-005', 'date_offset': 1, 'departure_hour': 11, 'seats': 48, 'price': 2000},
             
-            # Mumbai to Ahmedabad
-            {'route': 'Mumbai-Ahmedabad', 'bus': 'BUS-001', 'date_offset': 0, 'departure_hour': 6, 'seats': 45, 'price': 800},
-            {'route': 'Mumbai-Ahmedabad', 'bus': 'BUS-004', 'date_offset': 1, 'departure_hour': 12, 'seats': 55, 'price': 750},
+            # Mombasa to Nakuru
+            {'route': 'Mombasa-Nakuru', 'bus': 'BUS-004', 'date_offset': 0, 'departure_hour': 10, 'seats': 55, 'price': 2700},
+            {'route': 'Mombasa-Nakuru', 'bus': 'BUS-005', 'date_offset': 1, 'departure_hour': 15, 'seats': 50, 'price': 2500},
             
-            # Pune to Hyderabad
-            {'route': 'Pune-Hyderabad', 'bus': 'BUS-002', 'date_offset': 0, 'departure_hour': 22, 'seats': 40, 'price': 1000},
-            {'route': 'Pune-Hyderabad', 'bus': 'BUS-004', 'date_offset': 1, 'departure_hour': 8, 'seats': 50, 'price': 950},
+            # Nakuru to Kericho
+            {'route': 'Nakuru-Kericho', 'bus': 'BUS-001', 'date_offset': 0, 'departure_hour': 12, 'seats': 50, 'price': 900},
+            {'route': 'Nakuru-Kericho', 'bus': 'BUS-002', 'date_offset': 1, 'departure_hour': 9, 'seats': 40, 'price': 850},
         ]
 
         journey_count = 0

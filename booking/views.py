@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 import json
 
 from .models import Route, Bus, BusJourney, Booking
-from .forms import BookingForm, ScheduleSearchForm
+from .forms import BookingForm, ScheduleSearchForm, ContactForm
 
 
 def home(request):
@@ -39,7 +39,7 @@ def route_map(request):
     context = {
         'routes': routes,
         'journeys': journeys,
-        'map_center': [20.5937, 78.9629],  # India center coordinates
+        'map_center': [-0.0236, 37.9062],  # Kenya center coordinates
     }
     return render(request, 'booking/map.html', context)
 
@@ -227,5 +227,33 @@ def api_schedule_search(request):
     return JsonResponse(data, safe=False)
 
 
-from django.db import models
+def contact(request):
+    """Handle contact form submissions"""
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            # Process the contact form
+            # In a real application, you would send an email here
+            name = form.cleaned_data['name']
+            email = form.cleaned_data['email']
+            phone = form.cleaned_data['phone']
+            subject = form.cleaned_data['subject']
+            message = form.cleaned_data['message']
+            
+            # Here you could save to a Contact model or send email
+            # For now, we'll just display a success message
+            context = {
+                'form': form,
+                'submitted': True,
+                'name': name,
+            }
+            return render(request, 'booking/contact.html', context)
+    else:
+        form = ContactForm()
+    
+    context = {
+        'form': form,
+        'submitted': False,
+    }
+    return render(request, 'booking/contact.html', context)
 

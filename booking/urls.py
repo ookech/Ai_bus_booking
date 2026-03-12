@@ -8,6 +8,7 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('map/', views.route_map, name='route_map'),
     path('schedule/', views.schedule_list, name='schedule_list'),
+    path('contact/', views.contact, name='contact'),
     
     # Journey and booking
     path('journey/<int:journey_id>/', views.journey_detail, name='journey_detail'),
